@@ -1,0 +1,105 @@
+# Train a GPT-3 Small-sized decoder on FineWeb-Edu sample-10BT.
+name = "fineweb-edu-10bt"
+
+[model]
+vocab_size = 50257
+context_length = 1024
+n_layers = 12
+d_model = 768
+n_heads = 12
+head_dim = 64
+mlp_ratio = 4
+attention_pattern = "alternating"
+local_window = 256 # Matches the repo's GPT-3 Small preset.
+dropout = 0.0
+layer_norm_eps = 1e-5
+initializer_std = 0.02
+tie_embeddings = true
+
+[data]
+# Override the Hub configuration's file patterns. Keep 000_00041.parquet excluded.
+dataset_id = "HuggingFaceFW/fineweb-edu"
+dataset_config = "sample-10BT"
+revision = "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9"
+text_column = "text"
+train_split = "train"
+validation_split = "holdout[:1000]"
+test_split = "holdout[1000:2000]"
+streaming = false
+cache_dir = ".cache/huggingface"
+num_workers = 0
+shuffle_buffer_size = 10000
+append_eos = true
+document_mode = "rows"
+drop_remainder = true
+
+[data.data_files]
+train = [
+    "sample/10BT/000_00000.parquet",
+    "sample/10BT/001_00000.parquet",
+    "sample/10BT/002_00000.parquet",
+    "sample/10BT/003_00000.parquet",
+    "sample/10BT/004_00000.parquet",
+    "sample/10BT/005_00000.parquet",
+    "sample/10BT/006_00000.parquet",
+    "sample/10BT/007_00000.parquet",
+    "sample/10BT/008_00000.parquet",
+    "sample/10BT/009_00000.parquet",
+    "sample/10BT/010_00000.parquet",
+    "sample/10BT/011_00000.parquet",
+    "sample/10BT/012_00000.parquet",
+]
+holdout = [
+    "sample/10BT/013_00000.parquet",
+]
+
+[tokenizer]
+name = "openai-community/gpt2"
+revision = "main"
+eos_token_id = 50256
+
+[optimizer]
+name = "adamw"
+learning_rate = 6e-4
+min_learning_rate = 6e-5
+beta1 = 0.9
+beta2 = 0.95
+eps = 1e-8
+weight_decay = 0.1
+grad_clip_norm = 1.0
+scheduler = "cosine"
+warmup_steps = 100
+
+[training]
+seed = 42
+batch_size = 1
+gradient_accumulation_steps = 4 # 4,096 target tokens per update on one rank.
+max_steps = 40_000
+log_interval = 10
+eval_interval = 100
+checkpoint_interval = 10000
+keep_last_checkpoint = true
+generate_samples = true
+output_dir = "artifacts/fineweb-edu-10bt"
+
+[evaluation]
+batch_size = 1
+max_batches = 50
+sample_prompts = ["The history of", "Knowledge is"]
+max_new_tokens = 24
+tasks = []
+
+[generation]
+temperature = 0.8
+top_k = 40
+top_p = 0.95
+seed = 42
+stop_token_ids = []
+stop_strings = []
+
+[hardware]
+device = "cuda"
+precision = "bfloat16"
+compile_model = false
+gradient_checkpointing = true
+loss_chunk_size = 128

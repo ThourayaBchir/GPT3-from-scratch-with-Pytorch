@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+/pytest-of-*/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.cache/
+artifacts/
+/tworead_tokens*.p
+/tworead_tokens*.pt
+/tworead_wikitext.pt
+.env
+.DS_Store

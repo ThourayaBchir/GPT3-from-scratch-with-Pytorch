@@ -1,0 +1,30 @@
+# Matches the tiny model defaults. For other checkpoints use their model/tokenizer settings.
+name = "tiny-evaluation"
+
+[evaluation]
+batch_size = 2
+max_batches = 50
+sample_prompts = ["Once upon a time"]
+max_new_tokens = 32
+
+[[evaluation.tasks]]
+name = "sentiment-zero-shot"
+evaluation_file = "examples/tasks/evaluation.jsonl"
+instruction = "Classify the sentiment of the review as positive or negative."
+shots = 0
+
+[[evaluation.tasks]]
+name = "sentiment-one-shot"
+evaluation_file = "examples/tasks/evaluation.jsonl"
+demonstrations_file = "examples/tasks/demonstrations.jsonl"
+instruction = "Classify the sentiment of the review as positive or negative."
+shots = 1
+
+[generation]
+# 0.0 selects greedy decoding. Set e.g. 0.8 to enable sampling.
+temperature = 0.0
+top_p = 1.0
+seed = 42
+stop_token_ids = []
+stop_strings = []
+# top_k = 50

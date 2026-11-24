@@ -1,0 +1,51 @@
+# Short end-to-end validation, starting from random weights and fresh local Hub caches.
+name = "end-to-end"
+
+[model]
+context_length = 64
+n_layers = 2
+d_model = 64
+n_heads = 4
+head_dim = 16
+local_window = 16
+dropout = 0.1
+
+[data]
+document_mode = "wikitext_articles"
+dataset_id = "Salesforce/wikitext"
+dataset_config = "wikitext-2-raw-v1"
+train_split = "train[:400]"
+validation_split = "validation[:100]"
+test_split = "test[:100]"
+cache_dir = ".cache/huggingface/datasets"
+
+[optimizer]
+learning_rate = 0.003
+min_learning_rate = 0.0003
+warmup_steps = 3
+
+[training]
+seed = 42
+batch_size = 2
+gradient_accumulation_steps = 1
+max_steps = 30
+log_interval = 5
+eval_interval = 15
+checkpoint_interval = 15
+output_dir = "artifacts/end_to_end"
+
+[evaluation]
+batch_size = 2
+max_batches = 5
+sample_prompts = ["The history of", "Once upon a time"]
+max_new_tokens = 32
+
+[hardware]
+device = "cpu"
+precision = "float32"
+
+[generation]
+temperature = 0.8
+top_k = 40
+top_p = 0.95
+seed = 42
